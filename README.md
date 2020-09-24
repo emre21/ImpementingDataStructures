@@ -10,6 +10,6 @@ TODO
   * ADD GRAPH
   * Visual Studio Solution to CMake Project
   * Maybe Some heuristic algorithms
-  * SFINEA solutions instead of static_assert(has_equality<<<T>>>::value,"error")  
+  * SFINEA solutions instead of static_assert(has_equality<_T>::value,"error")  
  
 Note : DataStructures project output is static library 
