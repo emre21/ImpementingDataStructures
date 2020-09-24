@@ -14,4 +14,5 @@ TODO
   * Maybe Some heuristic algorithms
   * SFINEA solutions instead of static_assert(has_equality<_T>::value,"error")  
   * AND CHANGE SOLUTION NAME :)))
+  
 Note : DataStructures project output is static library 
