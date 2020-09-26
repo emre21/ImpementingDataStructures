@@ -20,7 +20,7 @@ public:
     LinkListNode(T value);
     LinkListNode(const LinkListNode& c_linkListNode);
     ~LinkListNode();
-    LinkListNode<T>& getNext();
+    LinkListNode<T>*& getNext();
     bool isLastNode();
 private:
     LinkListNode<T>* m_next = nullptr;
@@ -39,9 +39,9 @@ public:
 
     ~DoublyLinkListNode();
 
-    DoublyLinkListNode<T>& getNext();
+    DoublyLinkListNode<T>*& getNext();
 
-    DoublyLinkListNode<T>& getBack();
+    DoublyLinkListNode<T>*& getBack();
 
 private:
     DoublyLinkListNode<T>* m_nextNode = nullptr;
@@ -77,7 +77,7 @@ LinkListNode<T>::~LinkListNode() {
 }
 
 template <typename T>
-LinkListNode<T>& LinkListNode<T>::getNext()
+LinkListNode<T>*& LinkListNode<T>::getNext()
 {
     return m_next;
 }
@@ -119,13 +119,13 @@ DoublyLinkListNode<T>::~DoublyLinkListNode()
 
 }
 template <typename T>
-DoublyLinkListNode<T>& DoublyLinkListNode<T>::getNext()
+DoublyLinkListNode<T>*& DoublyLinkListNode<T>::getNext()
 {
     return m_nextNode;
 }
 
 template <typename T>
-DoublyLinkListNode<T>& DoublyLinkListNode<T>::getBack()
+DoublyLinkListNode<T>*& DoublyLinkListNode<T>::getBack()
 {
     return m_backNode;
 }
