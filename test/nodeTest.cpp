@@ -2,6 +2,21 @@
 #include <gtest/gtest.h>
 #include "Node.hpp"
 
+
+class NodeTest : public ::testing::Test {
+protected:
+	Node<int>* nodeInitilized;
+	Node<int>* nodeUnitilized;
+
+	void SetUp() override {
+		
+	}
+
+	void TearDown() override {
+
+	}
+};
+
 TEST(NodeTesting, NODE_INIT) {
 
 	Node<int> node(12);

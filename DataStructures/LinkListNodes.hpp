@@ -73,7 +73,7 @@ LinkListNode<T>::LinkListNode(const LinkListNode& c_linkListNode)
 
 template <typename T>
 LinkListNode<T>::~LinkListNode() {
-
+    
 }
 
 template <typename T>

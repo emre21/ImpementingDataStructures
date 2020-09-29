@@ -33,7 +33,7 @@ TEST_F(LinkListNodeTest, CONSTRUCTOR_TEST)
 	EXPECT_EQ(nodeInitized->getNext(), nullptr);
 	EXPECT_TRUE(nodeInitized->isLastNode());
 
-	nodeInitized->setValue(12);
+	nodeUnInitlized->setValue(12);
 
 	EXPECT_EQ(nodeUnInitlized->getValue(), 12);
 	EXPECT_EQ(nodeUnInitlized->getNext(), nullptr);
@@ -46,6 +46,6 @@ TEST_F(LinkListNodeTest, NEXT_NODE_TEST)
 	nodeInitized->getNext() = new LinkListNode<int>(13);
 	EXPECT_EQ(nodeInitized->getNext()->getValue(), 13);
 	EXPECT_FALSE(nodeInitized->isLastNode());
-
+	EXPECT_TRUE(nodeInitized->getNext()->isLastNode());
 
 }

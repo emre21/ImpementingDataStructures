@@ -10,6 +10,7 @@
 
 /*
     TODO
+        * add Deconstructor
         * write circularLinkList from intheritance LinkList
         * wirte CircularLÝnkList::addByIndex index > size control
         * wirte CircularLÝnkList::addByIndex add lastElement Feature
