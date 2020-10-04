@@ -2,11 +2,15 @@
 #ifndef LINKLISTS_HPP
 #define LINKLISTS_HPP
 
+#include <cassert>
+
 #include <utility>
 #include <functional>
 
 #include "has_operator.hpp"
 #include "LinkListNodes.hpp"
+
+
 
 /*
     TODO
@@ -14,6 +18,9 @@
         * write circularLinkList from intheritance LinkList
         * wirte CircularLÝnkList::addByIndex index > size control
         * wirte CircularLÝnkList::addByIndex add lastElement Feature
+
+
+        **ERROR first add error while calling linklist default constructor 
 */
 
 
@@ -23,40 +30,47 @@ class ILinkList {
 public:
     virtual void add(T) = 0;
     virtual void addByIndex(int, T) = 0;
-    virtual T& getElementByIndex(int) = 0;
+    virtual T getElementByIndex(int) = 0;
     virtual void deleteElementByIndex(int) = 0;
-    virtual void deleteElement(T) = 0;
+    virtual void deleteElement(T,std::function<T(bool)>) = 0;
     virtual int getSize() = 0;
     virtual T& getRoot() = 0;
 
 };
 
 template <typename T>
-class LinkList : public ILinkList<T> {
+class LinkList  {
 
 public:
     LinkList();
     LinkList(T value);
     void add(T value);
     void addByIndex(int index, T value);
-    T& getElementByIndex(int index);
+    T getElementByIndex(int index);
     void deleteElementByIndex(int index);
-    void deleteElement(T value, std::function<bool(T, T)> compareFunc);
-    void deleteElement(T value);
+    void deleteElement(T value, std::function<bool(T, T)> compareFunc = 0);
     int getSize();
-    T& getRoot();
+    T getRoot();
 
 protected:
-    LinkListNode<T>* m_rootNodePtr;
-    LinkListNode<T>* m_lastNodePtr;
+    LinkListNode<T>* m_rootNodePtr = nullptr;
+    LinkListNode<T>* m_lastNodePtr = nullptr;
     int m_size = 0;
 
-    LinkListNode<T>& getNodeByIndex(int index);
-    std::pair<bool, int> findValueIndex(T value, std::function<bool(T, T)> compareFunc = 0);
+    LinkListNode<T>*& getNodeByIndex(int index);
+    std::pair<bool, int> findValueIndexWithFunc(T value, std::function<bool(T, T)> compareFunc = 0);
     std::pair<bool, int> findValueIndex(T value);
 
-    inline void updateLastNodePtr(LinkListNode<T>&& t_lastNodePtr);
+    void updateLastNodePtr(LinkListNode<T>* t_lastNodePtr);
 };
+
+
+
+/*
+    
+    THERE ARE A LOT OF ERROR NEXT TWO CLASS :))))
+*/
+
 
 template <typename T>
 class DoublyLinkList : ILinkList<T> {
@@ -77,10 +91,10 @@ private:
     DoublyLinkListNode<T>* m_lastNodePtr = nullptr;
     int m_size = 0;
 
-    DoublyLinkListNode<T>& getNodeByIndex(int index);
-    std::pair<bool, int> findValueIndex(T value, std::function<bool(T, T)> compareFunc);
+    DoublyLinkListNode<T>*& getNodeByIndex(int index);
+    std::pair<bool, int> findValueIndex(T value, std::function<bool(T, T)> compareFunc = 0);
     std::pair<bool, int> findValueIndex(T value);
-    void updateLastNodePtr(DoublyLinkListNode<T>&& t_lastNodePtr);
+    void updateLastNodePtr(DoublyLinkListNode<T>* t_lastNodePtr);
 };
 
 template <typename T>
@@ -103,8 +117,8 @@ private:
     LinkListNode<T>* m_rootNodePtr;
     LinkListNode<T>* m_lastNodePtr;
 
-    void updateLastNodePtr(LinkListNode<T>&& t_lastNodePtr);
-    LinkListNode<T>& getNodeByIndex(int index);
+    void updateLastNodePtr(LinkListNode<T>* t_lastNodePtr);
+    LinkListNode<T>*& getNodeByIndex(int index);
     std::pair<bool, int> findValueIndex(T value, std::function<bool(T, T)> compareFunc = 0);
     std::pair<bool, int> findValueIndex(T value);
 
@@ -141,47 +155,53 @@ void LinkList<T>::add(T value)
 template <typename T>
 void LinkList<T>::addByIndex(int index, T value) {
 
-    static_assert(index > m_size, "Index error");
+    assert(index <= m_size);
+    
 
-    auto& prevNode = getNodeByIndex(index);
+    //auto& prevNode = getNodeByIndex(index);
+    //auto& nextNode = prevNode->getNextNode();
+    LinkListNode<T>* prevNode = getNodeByIndex(index);
+    LinkListNode<T>* nextNode = prevNode->getNext();
 
-    auto& nextNode = prevNode.getNextNode();
+    prevNode->getNext() = new LinkListNode(value);
+    prevNode->getNext()->getNext() = nextNode;
 
-    prevNode.getNext() = new LinkListNode(value);
-    prevNode.getNext().getNext() = nextNode;
 
+    m_size++;
     // last NOde update is required 
 }
 
 template <typename T>
-T& LinkList<T>::getElementByIndex(int index)
+T LinkList<T>::getElementByIndex(int index)
 {
-    static_assert(index > m_size, "Index error");
+    assert(index <= m_size);
 
-    return getNodeByIndex(index).getValue();
+    return getNodeByIndex(index)->getValue();
 }
 
 template <typename T>
 void LinkList<T>::deleteElementByIndex(int index)
 {
-    auto& prevNode = getNodeByIndex(index - 1);
+    LinkListNode<T>* prevNode = getNodeByIndex(index - 1);
 
-    auto& nextNode = prevNode.getNext().getNext();
+    LinkListNode<T>* nextNode = prevNode->getNext()->getNext();
 
-    delete prevNode.getNext();
+    delete prevNode->getNext();
 
-    prevNode.getNext() = nextNode;
+    prevNode->getNext() = nextNode;
+    
+    m_size--;
 }
 
-
+/*
 
 template <typename T>
-void LinkList<T>::deleteElement(T value)
+void LinkList<T>::deleteElement(T value) 
 {
 
     static_assert(has_equal<T>::value, "! ERROR :: Template parameter dont has {operator==}  ");
 
-    auto [find, index] = findValueIndex(value);
+    auto [bool find,int index] = findValueIndex(value);
     if (find == true)
     {
         deleteElementByIndex(index);
@@ -195,26 +215,32 @@ void LinkList<T>::deleteElement(T value)
 
     }
 }
-
+*/
 
 template <typename T>
 void LinkList<T>::deleteElement(T value, std::function<bool(T, T)> compareFunc)
 {
-
-
-    auto [find, index] = findValueIndex(value, compareFunc);
-    if (find != true)
+    
+    std::pair<bool, int> result;
+    if (compareFunc == 0)
     {
-        deleteElementByIndex(index);
+        static_assert(has_equal<T>::value, "! ERROR :: Template parameter dont has {operator==}  ");
+        result = findValueIndex(value);
+    }
+    else {
+        result = findValueIndexWithFunc(value, compareFunc);
+    }
+
+    if (result.first != true)
+    {
+        deleteElementByIndex(result.second);
     }
     else
     {
 
-        std::cerr << "Dont found " <<
-            value
-            << "in the list \n";
-
+        std::cerr << "Dont found in the list \n";
     }
+
 }
 
 
@@ -224,15 +250,15 @@ int LinkList<T>::getSize() {
 }
 
 template <typename T>
-T& LinkList<T>::getRoot() {
-    return m_rootNodePtr;
+T LinkList<T>::getRoot() {
+    return m_rootNodePtr->getValue();
 }
 
 template <typename T>
-LinkListNode<T>& LinkList<T>::getNodeByIndex(int index) {
+LinkListNode<T>*& LinkList<T>::getNodeByIndex(int index) {
 
     LinkListNode<T>* tempRoot = m_rootNodePtr;
-    for (int i = 0; i < index; ++i)
+    for (int i = 0; i < index; i++)
     {
         tempRoot = tempRoot->getNext();
     }
@@ -247,7 +273,7 @@ std::pair<bool, int> LinkList<T>::findValueIndex(T value) {
 
     int index = 0;
     bool found = true;
-    while (tempNode->getValue() != value)
+    while (!(tempNode->getValue() == value))
     {
         index++;
 
@@ -267,7 +293,7 @@ std::pair<bool, int> LinkList<T>::findValueIndex(T value) {
 
 
 template <typename T>
-std::pair<bool, int> LinkList<T>::findValueIndex(T value,
+std::pair<bool, int> LinkList<T>::findValueIndexWithFunc(T value,
     std::function<bool(T, T)> compareFunc)
 {
 
@@ -275,7 +301,7 @@ std::pair<bool, int> LinkList<T>::findValueIndex(T value,
     int index = 0;
     bool found = true;
 
-    while (compare_func(tempNode->getValue(), value) != true)
+    while (compareFunc(tempNode->getValue(), value) != true)
     {
         index++;
 
@@ -292,7 +318,7 @@ std::pair<bool, int> LinkList<T>::findValueIndex(T value,
 
 
 template <typename T>
-inline void LinkList<T>::updateLastNodePtr(LinkListNode<T>&& t_lastNodePtr)
+void LinkList<T>::updateLastNodePtr(LinkListNode<T>* t_lastNodePtr)
 {
     m_lastNodePtr = t_lastNodePtr;
 }
@@ -424,7 +450,7 @@ T& DoublyLinkList<T>::getRoot() {
 }
 
 template <typename T>
-DoublyLinkListNode<T>& DoublyLinkList<T>::getNodeByIndex(int index) {
+DoublyLinkListNode<T>*& DoublyLinkList<T>::getNodeByIndex(int index) {
 
     DoublyLinkListNode<T>* temp_root_ptr = m_rootNodePtr;
 
@@ -485,7 +511,7 @@ std::pair<bool, int> DoublyLinkList<T>::findValueIndex(T value)
 
 
 template <typename T>
-void DoublyLinkList<T>::updateLastNodePtr(DoublyLinkListNode<T>&& t_lastNodePtr)
+void DoublyLinkList<T>::updateLastNodePtr(DoublyLinkListNode<T>* t_lastNodePtr)
 {
 
     m_lastNodePtr = t_lastNodePtr;
@@ -642,14 +668,14 @@ T& CircularLinkList<T>::getRoot() {
 }
 
 template <typename T>
-void CircularLinkList<T>::updateLastNodePtr(LinkListNode<T>&& t_lastNodePtr)
+void CircularLinkList<T>::updateLastNodePtr(LinkListNode<T>* t_lastNodePtr)
 {
     m_lastNodePtr = t_lastNodePtr;
     m_lastNodePtr->getNext() = m_rootNodePtr;
 }
 
 template<typename T>
-LinkListNode<T>& CircularLinkList<T>::getNodeByIndex(int index)
+LinkListNode<T>*& CircularLinkList<T>::getNodeByIndex(int index)
 {
     int index = 0;
     LinkListNode<T>* tempNode = m_rootNodePtr;
