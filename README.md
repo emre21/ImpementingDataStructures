@@ -1,5 +1,7 @@
 # ImpementingDataStructures
 
+!!! DoublyLinkList and circular linklist dont work 
+!!! Linklist::deleteElement(T element,std::function ...) method dont work
 I try to implementing Data structures with c++17 And I try to learn google test freamwork
 
 if you want to run this code, you must change (additional include,library directories in test project's properties)
